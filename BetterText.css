@@ -27,22 +27,6 @@ body {
   padding: 64px 0 96px;
 }
 
-.article {
-  padding: 32px 0;
-  border: 0;
-  border-radius: 0;
-  background: #0a0a0a;
-  box-shadow: none;
-}
-
-.article > :first-child {
-  margin-top: 0;
-}
-
-.article > :last-child {
-  margin-bottom: 0;
-}
-
 h1,
 h2,
 h3,
@@ -126,9 +110,5 @@ hr {
   .page-shell {
     width: min(100% - 20px, 900px);
     padding: 20px 0 48px;
-  }
-
-  .article {
-    padding: 20px 0;
   }
 }
