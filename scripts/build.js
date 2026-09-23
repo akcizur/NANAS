@@ -3,28 +3,63 @@ import path from "node:path";
 import { marked } from "marked";
 
 const root = process.cwd();
-const sourcePath = path.join(root, "content", "index.md");
+const contentDir = path.join(root, "content");
 const templatePath = path.join(root, "template.html");
 const outputDir = path.join(root, "dist");
 const outputPath = path.join(outputDir, "index.html");
 const cssPath = path.join(root, "BetterText.css");
 const cssOutputPath = path.join(outputDir, "BetterText.css");
 
-if (!fs.existsSync(sourcePath)) {
-  throw new Error(`Missing Markdown source: ${sourcePath}`);
+if (!fs.existsSync(contentDir)) {
+  throw new Error(`Missing content directory: ${contentDir}`);
 }
 
 if (!fs.existsSync(templatePath)) {
   throw new Error(`Missing HTML template: ${templatePath}`);
 }
 
-const markdown = fs.readFileSync(sourcePath, "utf8");
+function findMarkdownFiles(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      files.push(...findMarkdownFiles(fullPath));
+      continue;
+    }
+
+    if (entry.isFile() && entry.name.toLowerCase().endsWith(".md")) {
+      files.push(fullPath);
+    }
+  }
+
+  return files.sort((a, b) =>
+    path.relative(contentDir, a).localeCompare(
+      path.relative(contentDir, b),
+      "cs",
+      { numeric: true, sensitivity: "base" }
+    )
+  );
+}
+
+const markdownFiles = findMarkdownFiles(contentDir);
+
+if (markdownFiles.length === 0) {
+  throw new Error("No Markdown files found in content/.");
+}
+
 const template = fs.readFileSync(templatePath, "utf8");
-const htmlContent = marked.parse(markdown);
 
 if (!template.includes("{{content}}")) {
   throw new Error("Template must contain the {{content}} placeholder.");
 }
+
+const htmlContent = markdownFiles
+  .map((file) => fs.readFileSync(file, "utf8"))
+  .map((markdown) => marked.parse(markdown))
+  .join("\n");
 
 const finalHtml = template.replace("{{content}}", htmlContent);
 
@@ -36,5 +71,10 @@ if (fs.existsSync(cssPath)) {
 }
 
 console.log("Build hotov.");
-console.log(`Markdown: ${sourcePath}`);
-console.log(`HTML:     ${outputPath}`);
+console.log(`Markdown files: ${markdownFiles.length}`);
+
+for (const file of markdownFiles) {
+  console.log(` - ${path.relative(contentDir, file)}`);
+}
+
+console.log(`HTML: ${outputPath}`);
