@@ -12,7 +12,9 @@ NANAS/
 │   └── workflows/
 │       └── deploy.yml
 ├── content/
-│   └── index.md
+│   ├── 01.md
+│   ├── 02.md
+│   └── ...
 ├── scripts/
 │   └── build.js
 ├── BetterText.css
@@ -26,6 +28,8 @@ NANAS/
 npm install
 npm run build
 ```
+
+Všechny `.md` soubory v `content/` se načtou rekurzivně, seřadí podle cesty/názvu a vykreslí postupně pod sebe do jedné HTML stránky. `index.md` už není speciální.
 
 Výstup vznikne v:
 
