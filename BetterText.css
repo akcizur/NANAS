@@ -28,11 +28,11 @@ body {
 }
 
 .article {
-  padding: 32px;
-  border: 1px solid #242424;
-  border-radius: 24px;
-  background: rgba(18, 18, 18, 0.88);
-  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.35);
+  padding: 32px 0;
+  border: 0;
+  border-radius: 0;
+  background: #0a0a0a;
+  box-shadow: none;
 }
 
 .article > :first-child {
@@ -129,7 +129,6 @@ hr {
   }
 
   .article {
-    padding: 20px;
-    border-radius: 18px;
+    padding: 20px 0;
   }
 }
