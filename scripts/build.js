@@ -7,8 +7,6 @@ const contentDir = path.join(root, "content");
 const templatePath = path.join(root, "template.html");
 const outputDir = path.join(root, "dist");
 const outputPath = path.join(outputDir, "index.html");
-const cssPath = path.join(root, "BetterText.css");
-const cssOutputPath = path.join(outputDir, "BetterText.css");
 
 if (!fs.existsSync(contentDir)) {
   throw new Error(`Missing content directory: ${contentDir}`);
@@ -57,17 +55,27 @@ if (!template.includes("{{content}}")) {
 }
 
 const htmlContent = markdownFiles
-  .map((file) => fs.readFileSync(file, "utf8"))
-  .map((markdown) => marked.parse(markdown))
+  .map((file) => {
+    const relativePath = path.relative(contentDir, file).split(path.sep).join("/");
+    const markdown = fs.readFileSync(file, "utf8");
+    const rendered = marked.parse(markdown);
+
+    return [
+      `<article class="post-item" data-source="${relativePath}">`,
+      rendered.trim(),
+      "</article>"
+    ].join("\n");
+  })
   .join("\n");
 
 const finalHtml = template.replace("{{content}}", htmlContent);
 
+fs.rmSync(outputDir, { recursive: true, force: true });
 fs.mkdirSync(outputDir, { recursive: true });
 fs.writeFileSync(outputPath, finalHtml, "utf8");
 
-if (fs.existsSync(cssPath)) {
-  fs.copyFileSync(cssPath, cssOutputPath);
+if (fs.existsSync(path.join(root, "BetterText.css"))) {
+  fs.copyFileSync(path.join(root, "BetterText.css"), path.join(outputDir, "BetterText.css"));
 }
 
 console.log("Build hotov.");
