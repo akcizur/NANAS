@@ -42,6 +42,15 @@ function findMarkdownFiles(dir) {
   );
 }
 
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 const markdownFiles = findMarkdownFiles(contentDir);
 
 if (markdownFiles.length === 0) {
@@ -55,14 +64,30 @@ if (!template.includes("{{content}}")) {
 }
 
 const htmlContent = markdownFiles
-  .map((file) => {
+  .map((file, index) => {
     const relativePath = path.relative(contentDir, file).split(path.sep).join("/");
-    const markdown = fs.readFileSync(file, "utf8");
+    const markdown = fs.readFileSync(file, "utf8").trim();
     const rendered = marked.parse(markdown);
+    const safeMarkdown = escapeHtml(markdown);
+    const postId = `post-${index + 1}`;
 
     return [
-      `<article class="post-item" data-source="${relativePath}">`,
-      rendered.trim(),
+      `<article class="post-item" id="${postId}" data-source="${relativePath}">`,
+      '  <div class="post-toolbar" role="toolbar" aria-label="Ovládání článku">',
+      '    <div class="post-source">',
+      '      <span class="post-source-dot" aria-hidden="true"></span>',
+      `      <span class="post-source-name">${escapeHtml(relativePath)}</span>`,
+      "    </div>",
+      '    <div class="post-actions">',
+      '      <button type="button" class="post-action is-active" data-post-mode="preview">Preview</button>',
+      '      <button type="button" class="post-action" data-post-mode="markdown">Markdown</button>',
+      '      <button type="button" class="post-action post-copy" data-copy-markdown aria-label="Kopírovat Markdown">',
+      '        <span class="post-copy-label">Copy</span>',
+      "      </button>",
+      "    </div>",
+      "  </div>",
+      `  <div class="post-preview" data-post-preview>${rendered.trim()}</div>`,
+      `  <pre class="post-markdown" data-post-markdown hidden><code>${safeMarkdown}</code></pre>`,
       "</article>"
     ].join("\n");
   })
