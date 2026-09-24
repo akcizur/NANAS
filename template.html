@@ -85,22 +85,22 @@
     </div>
   </header>
 
-  <main class="w-full mx-auto px-6 sm:px-12 py-14 sm:py-20 flex-grow space-y-16 content-width" id="main-container">
-    <section class="space-y-4">
-      <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] text-neutral-900 dark:text-white">
+  <main class="w-full mx-auto px-5 sm:px-10 lg:px-12 py-16 sm:py-24 lg:py-28 flex-grow space-y-20 sm:space-y-28 content-width" id="main-container">
+    <section class="space-y-6 sm:space-y-7">
+      <h2 class="text-[2.45rem] sm:text-6xl lg:text-7xl font-extrabold tracking-[-0.04em] leading-[0.98] text-neutral-900 dark:text-white">
         Markdown &rarr; HTML &rarr; GitHub Pages
       </h2>
-      <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-2xl">
+      <p class="text-base sm:text-xl text-neutral-600 dark:text-neutral-400 leading-[1.75] max-w-2xl">
         Tento web se generuje automaticky z adresáře <code>content/</code>. Každý Markdown soubor se při buildu převede na HTML a vykreslí postupně pod sebe.
       </p>
       <div>
-        <code class="px-3 py-1 text-xs font-mono font-medium bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 rounded-lg inline-block">content/*.md</code>
+        <code class="px-3.5 py-1.5 text-xs font-mono font-medium bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 rounded-lg inline-block">content/*.md</code>
       </div>
     </section>
 
-    <section class="space-y-8">
-      <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-900 pb-3">
-        <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Obsah</h3>
+    <section class="space-y-10 sm:space-y-12">
+      <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-900 pb-4">
+        <h3 class="text-2xl sm:text-3xl font-bold tracking-[-0.025em] text-neutral-900 dark:text-white">Obsah</h3>
 
         <div class="flex md:hidden items-center bg-neutral-100 dark:bg-neutral-900 p-1 rounded-lg text-xs">
           <button onclick="setViewMode('list')" class="px-2 py-1"><i class="fas fa-bars"></i></button>
@@ -125,7 +125,7 @@
   </footer>
 
   <div id="settingsModal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white dark:bg-neutral-900 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl border border-neutral-200/50 dark:border-neutral-800">
+    <div class="bg-white dark:bg-neutral-900 rounded-2xl max-w-md w-full p-7 sm:p-8 space-y-7 shadow-2xl border border-neutral-200/50 dark:border-neutral-800">
       <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-4">
         <h3 class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white">Nastavení zobrazení</h3>
         <button onclick="toggleSettingsModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
@@ -133,7 +133,7 @@
         </button>
       </div>
 
-      <div class="space-y-5 text-sm">
+      <div class="space-y-6 text-sm">
         <div class="space-y-2">
           <label class="font-medium text-neutral-700 dark:text-neutral-300 block">Šířka obsahu</label>
           <div class="grid grid-cols-3 gap-2">
@@ -231,7 +231,7 @@
 
     function setSpacing(density) {
       postsContainer.classList.remove("space-y-10", "space-y-14", "space-y-20");
-      postsContainer.classList.add(density === "compact" ? "space-y-10" : "space-y-20");
+      postsContainer.classList.add(density === "compact" ? "space-y-12" : "space-y-24");
       localStorage.setItem("spacingDensity", density);
     }
 
@@ -239,11 +239,11 @@
       postsContainer.className = "";
 
       if (mode === "list") {
-        postsContainer.className = "space-y-14";
+        postsContainer.className = "space-y-20 sm:space-y-24";
       } else if (mode === "grid") {
-        postsContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-6";
+        postsContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-8";
       } else if (mode === "magazine") {
-        postsContainer.className = "space-y-10";
+        postsContainer.className = "space-y-14 sm:space-y-18";
       } else {
         postsContainer.className = "divide-y divide-neutral-100 dark:divide-neutral-900 space-y-0";
       }
