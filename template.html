@@ -24,6 +24,123 @@
   <link rel="stylesheet" href="BetterText.css">
 
   <style>
+
+    .post-action {
+      min-height: 2rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: 0.65rem;
+      color: rgb(115 115 115);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    .post-action:hover {
+      color: rgb(23 23 23);
+      background: rgb(245 245 245);
+    }
+
+    .dark .post-action:hover {
+      color: rgb(245 245 245);
+      background: rgb(38 38 38);
+    }
+
+    .post-action.is-active {
+      color: rgb(23 23 23);
+      background: rgb(255 255 255);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+    }
+
+    .dark .post-action.is-active {
+      color: rgb(245 245 245);
+      background: rgb(38 38 38);
+    }
+
+    .post-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid rgb(229 229 229);
+    }
+
+    .dark .post-toolbar {
+      border-color: rgb(38 38 38);
+    }
+
+    .post-source {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: rgb(163 163 163);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.66rem;
+      line-height: 1;
+    }
+
+    .post-source-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .post-source-dot {
+      width: 0.36rem;
+      height: 0.36rem;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .post-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.1rem;
+      padding: 0.18rem;
+      border-radius: 0.8rem;
+      background: rgb(245 245 245);
+    }
+
+    .dark .post-actions {
+      background: rgb(23 23 23);
+    }
+
+    .post-preview[hidden],
+    .post-markdown[hidden] {
+      display: none;
+    }
+
+    .post-markdown {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .post-markdown code {
+      display: block;
+      min-width: 0;
+    }
+
+    @media (max-width: 640px) {
+      .post-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .post-actions {
+        width: 100%;
+      }
+
+      .post-action {
+        flex: 1 1 0;
+      }
+    }
+
     body {
       font-family: "Google Sans", "Inter", sans-serif;
     }
@@ -274,11 +391,96 @@
       });
     }
 
+    function setPostMode(article, mode) {
+      const preview = article.querySelector("[data-post-preview]");
+      const markdown = article.querySelector("[data-post-markdown]");
+
+      if (!preview || !markdown) return;
+
+      const showMarkdown = mode === "markdown";
+      preview.hidden = showMarkdown;
+      markdown.hidden = !showMarkdown;
+
+      article.querySelectorAll("[data-post-mode]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.postMode === mode);
+        button.setAttribute("aria-pressed", button.dataset.postMode === mode ? "true" : "false");
+      });
+
+      article.dataset.postMode = mode;
+    }
+
+    async function copyText(text, button, successLabel = "Copied") {
+      try {
+        await navigator.clipboard.writeText(text);
+        const label = button.querySelector(".post-copy-label");
+        const previous = label ? label.textContent : "";
+        if (label) label.textContent = successLabel;
+        window.setTimeout(() => {
+          if (label) label.textContent = previous || "Copy";
+        }, 1400);
+      } catch {
+        const label = button.querySelector(".post-copy-label");
+        if (label) label.textContent = "Select";
+        window.setTimeout(() => {
+          if (label) label.textContent = "Copy";
+        }, 1400);
+      }
+    }
+
+    function enhancePostInteractions() {
+      document.querySelectorAll(".post-item").forEach((article) => {
+        const defaultMode = article.dataset.postMode || "preview";
+
+        article.querySelectorAll("[data-post-mode]").forEach((button) => {
+          button.addEventListener("click", () => {
+            setPostMode(article, button.dataset.postMode);
+          });
+        });
+
+        const copyButton = article.querySelector("[data-copy-markdown]");
+        const markdown = article.querySelector("[data-post-markdown]");
+
+        if (copyButton && markdown) {
+          copyButton.addEventListener("click", () => {
+            copyText(markdown.textContent.trim(), copyButton);
+          });
+        }
+
+        setPostMode(article, defaultMode);
+      });
+
+      document.querySelectorAll(".post-preview pre").forEach((pre) => {
+        const code = pre.querySelector("code");
+        if (!code || pre.querySelector(".code-copy")) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "code-copy-wrap";
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "code-copy";
+        button.textContent = "Copy";
+        button.setAttribute("aria-label", "Kopírovat kód");
+
+        button.addEventListener("click", () => {
+          copyText(code.textContent, button, "Copied");
+          window.setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1400);
+        });
+
+        wrapper.appendChild(button);
+      });
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       setViewMode(localStorage.getItem("viewMode") || "list");
       setReadingWidth(localStorage.getItem("readingWidth") || "48rem");
       setFontSize(localStorage.getItem("fontSize") || "base");
       setSpacing(localStorage.getItem("spacingDensity") || "airy");
+      enhancePostInteractions();
     });
   </script>
 </body>
