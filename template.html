@@ -25,6 +25,64 @@
 
   <style>
 
+    .back-to-top {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 40;
+      width: 2.75rem;
+      height: 2.75rem;
+      border: 1px solid rgb(229 229 229);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.94);
+      color: rgb(23 23 23);
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.08);
+    }
+
+    .dark .back-to-top {
+      border-color: rgb(64 64 64);
+      background: rgba(23,23,23,0.94);
+      color: rgb(245 245 245);
+    }
+
+    .back-to-top[hidden] {
+      display: none;
+    }
+
+    .code-copy-wrap {
+      position: relative;
+      margin: 2rem 0 2.25rem;
+    }
+
+    .code-copy-wrap pre {
+      margin: 0;
+      padding-right: 5rem;
+    }
+
+    .code-copy {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      padding: 0.35rem 0.55rem;
+      border: 1px solid rgb(64 64 64);
+      border-radius: 0.5rem;
+      background: rgb(23 23 23);
+      color: rgb(212 212 212);
+      font: 500 0.65rem/1 "JetBrains Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+
+    .code-copy:hover {
+      color: #fff;
+      border-color: rgb(115 115 115);
+    }
+
+    .dark .code-copy {
+      background: rgb(17 17 17);
+    }
+
     .post-action {
       min-height: 2rem;
       padding: 0.45rem 0.7rem;
@@ -175,17 +233,17 @@
       <h1 class="text-base sm:text-lg font-extrabold tracking-tight uppercase">NANAS</h1>
 
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <div class="hidden md:flex items-center bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl text-xs">
-          <button onclick="setViewMode('list')" id="btn-list" title="Minimalistický seznam" class="px-2 py-1 rounded-lg font-medium">
+        <div class="hidden md:flex items-center bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl text-xs" role="group" aria-label="Režim zobrazení">
+          <button onclick="setViewMode('list')" id="btn-list" data-view-button="list" title="Seznam" class="px-2 py-1 rounded-lg font-medium">
             <i class="fas fa-bars"></i>
           </button>
-          <button onclick="setViewMode('grid')" id="btn-grid" title="Grid karty" class="px-2.5 py-1 rounded-lg font-medium">
+          <button onclick="setViewMode('grid')" id="btn-grid" data-view-button="grid" title="Mřížka" class="px-2.5 py-1 rounded-lg font-medium">
             <i class="fas fa-th-large"></i>
           </button>
-          <button onclick="setViewMode('magazine')" id="btn-magazine" title="Magazínový styl" class="px-2.5 py-1 rounded-lg font-medium">
+          <button onclick="setViewMode('magazine')" id="btn-magazine" data-view-button="magazine" title="Magazín" class="px-2.5 py-1 rounded-lg font-medium">
             <i class="fas fa-newspaper"></i>
           </button>
-          <button onclick="setViewMode('compact')" id="btn-compact" title="Kompaktní přehled" class="px-2.5 py-1 rounded-lg font-medium">
+          <button onclick="setViewMode('compact')" id="btn-compact" data-view-button="compact" title="Kompaktní" class="px-2.5 py-1 rounded-lg font-medium">
             <i class="fas fa-list-ul"></i>
           </button>
         </div>
@@ -217,21 +275,28 @@
 
     <section class="space-y-10 sm:space-y-12">
       <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-900 pb-4">
-        <h3 class="text-2xl sm:text-3xl font-bold tracking-[-0.025em] text-neutral-900 dark:text-white">Obsah</h3>
+        <div class="flex items-baseline gap-3">
+          <h3 class="text-2xl sm:text-3xl font-bold tracking-[-0.025em] text-neutral-900 dark:text-white">Obsah</h3>
+          <span id="post-count" class="text-[0.68rem] font-mono uppercase tracking-[0.16em] text-neutral-400 dark:text-neutral-500">{{postCount}}</span>
+        </div>
 
-        <div class="flex md:hidden items-center bg-neutral-100 dark:bg-neutral-900 p-1 rounded-lg text-xs">
-          <button onclick="setViewMode('list')" class="px-2 py-1"><i class="fas fa-bars"></i></button>
-          <button onclick="setViewMode('grid')" class="px-2 py-1"><i class="fas fa-th-large"></i></button>
-          <button onclick="setViewMode('magazine')" class="px-2 py-1"><i class="fas fa-newspaper"></i></button>
-          <button onclick="setViewMode('compact')" class="px-2 py-1"><i class="fas fa-list-ul"></i></button>
+        <div class="flex md:hidden items-center bg-neutral-100 dark:bg-neutral-900 p-1 rounded-lg text-xs" role="group" aria-label="Režim zobrazení">
+          <button onclick="setViewMode('list')" data-view-button="list" class="px-2 py-1"><i class="fas fa-bars"></i></button>
+          <button onclick="setViewMode('grid')" data-view-button="grid" class="px-2 py-1"><i class="fas fa-th-large"></i></button>
+          <button onclick="setViewMode('magazine')" data-view-button="magazine" class="px-2 py-1"><i class="fas fa-newspaper"></i></button>
+          <button onclick="setViewMode('compact')" data-view-button="compact" class="px-2 py-1"><i class="fas fa-list-ul"></i></button>
         </div>
       </div>
 
-      <div id="posts-container" class="space-y-14">
+      <div id="posts-container" class="view-list" data-font-size="base" data-spacing="airy">
         {{content}}
       </div>
     </section>
   </main>
+
+  <button id="backToTop" type="button" aria-label="Zpět nahoru" class="back-to-top" hidden>
+    <i class="fas fa-arrow-up"></i>
+  </button>
 
   <footer class="w-full bg-white dark:bg-neutral-950 border-t border-neutral-100 dark:border-neutral-900">
     <div class="max-w-4xl mx-auto px-6 sm:px-12 py-8 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 content-width">
@@ -330,14 +395,31 @@
     }
 
     function setFontSize(size) {
-      postsContainer.classList.remove("text-sm", "text-base", "text-lg");
-      postsContainer.classList.add("text-" + size);
+      postsContainer.dataset.fontSize = size;
       localStorage.setItem("fontSize", size);
 
       ["sm", "base", "lg"].forEach((value) => {
-        const btn = document.getElementById("font-" + value);
+        document.querySelectorAll("[id^=font-]").forEach((btn) => {
+          const active = btn.id === "font-" + value && value === size;
+          if (btn.id === "font-" + value) {
+            btn.classList.toggle("bg-neutral-900", active);
+            btn.classList.toggle("text-white", active);
+            btn.classList.toggle("dark:bg-white", active);
+            btn.classList.toggle("dark:text-neutral-900", active);
+            btn.classList.toggle("border-transparent", active);
+          }
+        });
+      });
+    }
+
+    function setSpacing(density) {
+      postsContainer.dataset.spacing = density;
+      localStorage.setItem("spacingDensity", density);
+
+      ["compact", "airy"].forEach((value) => {
+        const btn = document.getElementById("space-" + value);
         if (!btn) return;
-        const active = value === size;
+        const active = value === density;
         btn.classList.toggle("bg-neutral-900", active);
         btn.classList.toggle("text-white", active);
         btn.classList.toggle("dark:bg-white", active);
@@ -346,48 +428,20 @@
       });
     }
 
-    function setSpacing(density) {
-      postsContainer.classList.remove("space-y-10", "space-y-14", "space-y-20");
-      postsContainer.classList.add(density === "compact" ? "space-y-12" : "space-y-24");
-      localStorage.setItem("spacingDensity", density);
-    }
-
     function setViewMode(mode) {
-      postsContainer.className = "";
-
-      if (mode === "list") {
-        postsContainer.className = "space-y-20 sm:space-y-24";
-      } else if (mode === "grid") {
-        postsContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-8";
-      } else if (mode === "magazine") {
-        postsContainer.className = "space-y-14 sm:space-y-18";
-      } else {
-        postsContainer.className = "divide-y divide-neutral-100 dark:divide-neutral-900 space-y-0";
-      }
-
-      postsContainer.querySelectorAll(".post-item").forEach((article, index) => {
-        article.className = "post-item";
-
-        if (mode === "grid") {
-          article.classList.add("min-w-0", "pb-6");
-        } else if (mode === "compact") {
-          article.classList.add("py-4");
-        } else if (mode === "magazine" && index === 0) {
-          article.classList.add("pb-4");
-        }
-      });
-
+      postsContainer.className = "view-" + mode;
+      postsContainer.dataset.spacing = localStorage.getItem("spacingDensity") || postsContainer.dataset.spacing || "airy";
+      postsContainer.dataset.fontSize = localStorage.getItem("fontSize") || postsContainer.dataset.fontSize || "base";
       localStorage.setItem("viewMode", mode);
 
-      ["list", "grid", "magazine", "compact"].forEach((value) => {
-        const btn = document.getElementById("btn-" + value);
-        if (!btn) return;
-        const active = value === mode;
+      document.querySelectorAll("[data-view-button]").forEach((btn) => {
+        const active = btn.dataset.viewButton === mode;
         btn.classList.toggle("bg-white", active);
         btn.classList.toggle("dark:bg-neutral-800", active);
         btn.classList.toggle("shadow-sm", active);
         btn.classList.toggle("text-black", active);
         btn.classList.toggle("dark:text-white", active);
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
       });
     }
 
@@ -475,12 +529,46 @@
       });
     }
 
+    const backToTop = document.getElementById("backToTop");
+    const settingsModal = document.getElementById("settingsModal");
+
+    function updateBackToTop() {
+      backToTop.hidden = window.scrollY < 560;
+    }
+
+    backToTop.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    window.addEventListener("scroll", updateBackToTop, { passive: true });
+
+    settingsModal.addEventListener("click", (event) => {
+      if (event.target === settingsModal) toggleSettingsModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (!settingsModal.classList.contains("hidden")) toggleSettingsModal();
+        return;
+      }
+
+      const tag = document.activeElement?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || document.activeElement?.isContentEditable) return;
+
+      if (event.key === "1") setViewMode("list");
+      if (event.key === "2") setViewMode("grid");
+      if (event.key === "3") setViewMode("magazine");
+      if (event.key === "4") setViewMode("compact");
+      if (event.key.toLowerCase() === "t") document.getElementById("modeToggle").click();
+    });
+
     window.addEventListener("DOMContentLoaded", () => {
       setViewMode(localStorage.getItem("viewMode") || "list");
       setReadingWidth(localStorage.getItem("readingWidth") || "48rem");
       setFontSize(localStorage.getItem("fontSize") || "base");
       setSpacing(localStorage.getItem("spacingDensity") || "airy");
       enhancePostInteractions();
+      updateBackToTop();
     });
   </script>
 </body>
