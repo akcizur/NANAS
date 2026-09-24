@@ -67,7 +67,10 @@ const htmlContent = markdownFiles
   .map((file, index) => {
     const relativePath = path.relative(contentDir, file).split(path.sep).join("/");
     const markdown = fs.readFileSync(file, "utf8").trim();
-    const rendered = marked.parse(markdown, {\n      gfm: true,\n      breaks: false\n    });
+    const rendered = marked.parse(markdown, {
+      gfm: true,
+      breaks: false
+    });
     const safeMarkdown = escapeHtml(markdown);
     const postId = `post-${index + 1}`;
 
