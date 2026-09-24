@@ -67,14 +67,15 @@ const htmlContent = markdownFiles
   .map((file, index) => {
     const relativePath = path.relative(contentDir, file).split(path.sep).join("/");
     const markdown = fs.readFileSync(file, "utf8").trim();
-    const rendered = marked.parse(markdown);
+    const rendered = marked.parse(markdown, {\n      gfm: true,\n      breaks: false\n    });
     const safeMarkdown = escapeHtml(markdown);
     const postId = `post-${index + 1}`;
 
     return [
-      `<article class="post-item" id="${postId}" data-source="${relativePath}">`,
+      `<article class="post-item" id="${postId}" data-source="${relativePath}" data-post-index="${index + 1}">`,
       '  <div class="post-toolbar" role="toolbar" aria-label="Ovládání článku">',
       '    <div class="post-source">',
+      `      <span class="post-number">#${String(index + 1).padStart(2, "0")}</span>`,
       '      <span class="post-source-dot" aria-hidden="true"></span>',
       `      <span class="post-source-name">${escapeHtml(relativePath)}</span>`,
       "    </div>",
@@ -93,7 +94,9 @@ const htmlContent = markdownFiles
   })
   .join("\n");
 
-const finalHtml = template.replace("{{content}}", htmlContent);
+const finalHtml = template
+  .replace("{{content}}", htmlContent)
+  .replace("{{postCount}}", String(markdownFiles.length).padStart(2, "0"));
 
 fs.rmSync(outputDir, { recursive: true, force: true });
 fs.mkdirSync(outputDir, { recursive: true });
